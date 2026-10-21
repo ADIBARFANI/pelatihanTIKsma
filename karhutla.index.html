@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Siaga Karhutla</title>
+    <style>
+        /* Gaya tampilan sederhana dan bersih agar cepat dimuat di HP */
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #d9534f; text-align: center; }
+        .section { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, textarea, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #d9534f; color: white; border: none; padding: 10px 15px; margin-top: 15px; cursor: pointer; width: 100%; border-radius: 4px; font-weight: bold; }
+        button:hover { background-color: #c9302c; }
+        .hasil { margin-top: 15px; padding: 10px; border-radius: 4px; font-weight: bold; display: none; }
+        .aman { background-color: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; }
+        .waspada { background-color: #fcf8e3; color: #8a6d3b; border: 1px solid #faebcc; }
+        .bahaya { background-color: #f2dede; color: #a94442; border: 1px solid #ebccd1; }
+        pre { background: #eee; padding: 10px; white-space: pre-wrap; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌲 Siaga Karhutla Web v1.0 🌲</h1>
+    <p style="text-align: center; color: #666;">Alat bantu cepat untuk relawan dan masyarakat lapangan.</p>
+
+    <!-- FITUR 1: CEK RISIKO CUACA -->
+    <div class="section">
+        <h2>🌡️ Cek Risiko Cuaca</h2>
+        <label for="suhu">Masukkan Suhu Udara (°C):</label>
+        <input type="number" id="suhu" placeholder="Contoh: 33">
+        <button onclick="cekRisiko()">Analisis Risiko</button>
+        <div id="boxHasil" class="hasil"></div>
+    </div>
+
+    <!-- FITUR 2: GENERATOR LAPORAN WHATSAPP -->
+    <div class="section">
+        <h2>📝 Generator Teks Laporan Darurat</h2>
+        
+        <label for="nama">Nama Pelapor:</label>
+        <input type="text" id="nama" placeholder="Nama Anda">
+        
+        <label for="lokasi">Lokasi / Koordinat:</label>
+        <input type="text" id="lokasi" placeholder="Nama desa atau titik GPS">
+        
+        <label for="kondisi">Kondisi Api & Asap:</label>
+        <select id="kondisi">
+            <option value="Asap tipis/Mulai muncul titik api">Asap tipis / Titik api kecil</option>
+            <option value="Api menjalar cepat, asap pekat">Api menjalar cepat & Asap pekat</option>
+            <option value="Kebakaran besar, mendekati pemukiman">Kebakaran besar & Dekat pemukiman</option>
+        </select>
+        
+        <button onclick="buatLaporan()">Buat & Salin Teks Laporan</button>
+        
+        <div id="AreaLaporan" style="display:none; margin-top:15px;">
+            <p><strong>Teks siap dikirim ke Damkar/WA Group:</strong></p>
+            <pre id="teksLaporan"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Logika Pemrograman Javascript (Mirip if/else di Python)
+    function cekRisiko() {
+        const suhu = document.getElementById('suhu').value;
+        const box = document.getElementById('boxHasil');
+        
+        if (!suhu) {
+            alert("Silakan masukkan angka suhu terlebih dahulu!");
+            return;
+        }
+
+        box.style.display = "block";
+        
+        if (suhu < 30) {
+            box.className = "hasil aman";
+            box.innerHTML = "🟢 STATUS: AMAN (Risiko Rendah)<br>Rekomendasi: Tetap pantau lingkungan sekitar secara berkala.";
+        } else if (suhu >= 30 && suhu <= 35) {
+            box.className = "hasil waspada";
+            box.innerHTML = "🟡 STATUS: WASPADA (Risiko Sedang)<br>Rekomendasi: Jangan membakar sampah atau membuka lahan dengan api!";
+        } else {
+            box.className = "hasil bahaya";
+            box.innerHTML = "🔴 STATUS: BAHAYA TINGGI (Risiko Ekstrem)<br>Rekomendasi: Siapkan alat pemadam darurat, awasi area rawan, batasi aktivitas luar!";
+        }
+    }
+
+    function buatLaporan() {
+        const nama = document.getElementById('nama').value;
+        const lokasi = document.getElementById('lokasi').value;
+        const kondisi = document.getElementById('kondisi').value;
+        const waktu = new Date().toLocaleString('id-ID');
+
+        if (!nama || !lokasi) {
+            alert("Mohon isi Nama dan Lokasi terlebih dahulu!");
+            return;
+        }
+
+        const formatTeks = `🚨 *LAPORAN INSIDEN KARHUTLA* 🚨\n` +
+                           `--------------------------------------\n` +
+                           `📅 Waktu Lapor : ${waktu}\n` +
+                           `👤 Pelapor      : ${nama}\n` +
+                           `📍 Lokasi TKP   : ${lokasi}\n` +
+                           `🔥 Kondisi Lap  : ${kondisi}\n\n` +
+                           `*Status:* Mohon bantuan armada pemadam kebakaran dan tim evakuasi segera ke lokasi!`;
+
+        document.getElementById('teksLaporan').innerText = formatTeks;
+        document.getElementById('AreaLaporan').style.display = "block";
+
+        // Otomatis menyalin ke clipboard (fitur keren biar relawan gak perlu blok teks)
+        navigator.clipboard.writeText(formatTeks);
+        alert("Teks laporan berhasil dibuat dan otomatis TERSALIN! Tinggal Anda paste (tempel) ke WhatsApp.");
+    }
+</script>
+
+</body>
+</html>
